@@ -1,6 +1,7 @@
 from converter import get_event_data
+from google_calendar import CalendarClient
 from query import get_event_messages
 
-messages = get_event_messages()
-event_data = get_event_data(messages[0]["ts"], messages[0]["text"])
-print(event_data)
+if __name__ == "__main__":
+    # create_multiple_events()
+    # print_event_data()
