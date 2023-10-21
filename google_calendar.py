@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 load_dotenv()
 
 
-class CalendarClient:
+class GoogleCalendarClient:
     def __init__(self, calendar_id=None):
         self.calendar_id = calendar_id
 
