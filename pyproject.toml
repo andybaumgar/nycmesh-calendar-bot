@@ -8,7 +8,8 @@ dependencies = [
     "openai", 
     "google_api_python_client", 
     "google_auth_oauthlib", 
-    "google-auth-httplib2"
+    "google-auth-httplib2",
+    "click"
 ]
 
 [project.optional-dependencies]
