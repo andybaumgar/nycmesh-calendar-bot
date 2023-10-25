@@ -9,7 +9,7 @@ def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, ca
                 "fields": [
                     {
                         "type": "mrkdwn",
-                        "text": "It looks like you are posting a volunteer opportunity.  Would you like to post the event to our calendar?",
+                        "text": f"It looks like you are posting a volunteer opportunity.  Would you like to post the event to our calendar?\n\nParsed event details:\n\n{calendar_text}",
                     }
                 ],
             },
