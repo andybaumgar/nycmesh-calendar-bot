@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
+from calendar_bot.event_extractor import get_event_data, get_event_data_summary
 from calendar_bot.utils.block_kit_templates import confirm_message_block_kit
+from calendar_bot.utils.block_kit_utils import get_block_kit_formatted_message
 from calendar_bot.utils.message_classification import is_in_volunteer_channel
 
 load_dotenv()
@@ -23,14 +25,16 @@ def run_app(config):
         # ],
     )
     def respond_with_calendar_suggestion(message):
-        root_message_ts = message["thread_ts"] if "thread_ts" in message else message["ts"]
+        event_data = get_event_data(message["ts"], message["text"])
+        summary = get_event_data_summary(event_data)
+
         app.client.chat_postEphemeral(
             channel=message["channel"],
             blocks=confirm_message_block_kit(
                 channel_id=message["channel"],
-                message_ts=root_message_ts,
+                message_ts=message["ts"],
                 user_id=message["user"],
-                calendar_text="Test message text",
+                summary=summary,
             )["blocks"],
             text="New volunteer message detected, offering to add event to calendar on supported platforms",
             user=message["user"],

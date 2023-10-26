@@ -1,21 +1,18 @@
-from event_extractor import get_event_data
-from google_calendar import CalendarClient
-from query_slack import get_slack_event_messages
-
 import os
 
 from dotenv import load_dotenv
 
-from event_extractor import get_event_data
-from google_calendar import GoogleCalendarClient
-from utils.date_utils import add_hours_to_date
-from query_slack import SlackMessage
+from calendar_bot.event_extractor import get_event_data
+from calendar_bot.google_calendar import GoogleCalendarClient
+from calendar_bot.query_slack import SlackMessage
+from calendar_bot.utils.date_utils import add_hours_to_date
 
 load_dotenv()
 
 calendar_client = GoogleCalendarClient(os.environ.get("TEST_CALENDAR_ID"))
 
-def create_event(message:SlackMessage):
+
+def create_event(message: SlackMessage):
     event_data = get_event_data(message.ts, message.text)
 
     m = message
@@ -30,6 +27,8 @@ def create_event(message:SlackMessage):
         end=end_with_offset,
     )
 
+
 if __name__ == "__main__":
+    pass
     # create_multiple_events()
     # print_event_data()

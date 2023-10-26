@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from query_slack import get_slack_event_messages, save_messages
+from calendar_bot.query_slack import get_slack_event_messages, save_messages
 
 
 def update_saved_messages():

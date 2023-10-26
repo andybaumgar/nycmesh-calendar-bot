@@ -1,10 +1,11 @@
 import os
+from datetime import datetime
 
 from dotenv import load_dotenv
 
-from event_extractor import get_event_data
-from google_calendar import GoogleCalendarClient
-from query_slack import SlackMessage
+from calendar_bot.event_extractor import EventData, get_event_data, get_event_data_summary
+from calendar_bot.google_calendar import GoogleCalendarClient
+from calendar_bot.query_slack import SlackMessage
 
 load_dotenv()
 
@@ -21,6 +22,7 @@ def test_good_message_coney_island():
 
     slack_message = SlackMessage(**message)
     event_data = get_event_data(slack_message.ts, slack_message.text)
+    print(event_data)
     assert event_data.is_event == True
 
 
@@ -63,5 +65,25 @@ def test_bad_empty_message():
     assert event_data.is_event == False, f"Message {message} should not be an event"
 
 
+def test_get_event_data_summary():
+    date_object = datetime.strptime("2021-09-23T00:00:00", "%Y-%m-%dT%H:%M:%S")
+
+    event_data = EventData(
+        date=date_object,
+        title="Test event title",
+        is_event=True,
+        description="Test event description",
+    )
+
+    summary = get_event_data_summary(event_data)
+    expected_summary = """Title: Test event title
+Date: Thursday, September 23, 2021 12:00 AM 
+Description: Test event description"""
+
+    print(summary)
+
+    assert summary == expected_summary, f"Summary {summary} does not match expected summary {expected_summary}"
+
+
 if __name__ == "__main__":
-    pass
+    test_bad_empty_message()

@@ -1,17 +1,15 @@
 import json
 
 
-def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, calendar_text=None):
+def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, summary=None):
     return {
         "blocks": [
             {
                 "type": "section",
-                "fields": [
-                    {
-                        "type": "mrkdwn",
-                        "text": f"It looks like you are posting a volunteer opportunity.  Would you like to post the event to our calendar?\n\nParsed event details:\n\n{calendar_text}",
-                    }
-                ],
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"It looks like you are posting a volunteer opportunity.\nWould you like to add the event to our calendar?\n\nParsed event details:\n\n{summary}",
+                },
             },
             {
                 "type": "actions",
@@ -21,7 +19,12 @@ def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, ca
                         "text": {"type": "plain_text", "emoji": True, "text": "Post event"},
                         "style": "primary",
                         "value": json.dumps(
-                            {"channel": channel_id, "ts": message_ts, "user": user_id, calendar_text: calendar_text}
+                            {
+                                "channel": channel_id,
+                                "ts": message_ts,
+                                "user": user_id,
+                                summary: summary,
+                            }
                         ),
                         "action_id": "calendar_suggestion_ok",
                     },
@@ -30,7 +33,12 @@ def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, ca
                         "text": {"type": "plain_text", "emoji": True, "text": "Edit"},
                         "action_id": "calendar_suggestion_edit",
                         "value": json.dumps(
-                            {"channel": channel_id, "ts": message_ts, "user": user_id, "calendar_text": calendar_text}
+                            {
+                                "channel": channel_id,
+                                "ts": message_ts,
+                                "user": user_id,
+                                "calendar_text": summary,
+                            }
                         ),
                     },
                     {
