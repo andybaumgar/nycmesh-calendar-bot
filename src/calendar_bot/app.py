@@ -9,7 +9,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 from .event_extractor import EventData, get_event_data, get_event_data_summary
 from .google_calendar import GoogleCalendarClient
-from .query_slack import SlackMessage, get_username
+from .slack import SlackMessage, close_ephemeral, get_username
 from .utils.block_kit_templates import confirm_message_block_kit
 from .utils.message_classification import is_in_volunteer_channel
 from .utils.post_event import post_calendar_event_from_event
@@ -31,21 +31,25 @@ def run_app(config):
         # ],
     )
     def respond_with_calendar_suggestion(message):
-        print("test")
-        event_data = get_event_data(message["ts"], message["text"])
-        summary = get_event_data_summary(event_data)
         link = app.client.chat_getPermalink(message_ts=message["ts"], channel=message["channel"]).data["permalink"]
+        message_object = SlackMessage(
+            ts=message["ts"],
+            text=message["text"],
+            username=get_username(message["user"], app.client),
+            link=link,
+            user_id=message["user"],
+            channel_id=message["channel"],
+        )
+
+        event_data = get_event_data(message["ts"], message["text"])
+        summary = get_event_data_summary(event_data, link)
 
         app.client.chat_postEphemeral(
             channel=message["channel"],
             blocks=confirm_message_block_kit(
-                channel_id=message["channel"],
-                message_ts=message["ts"],
-                user_id=message["user"],
+                message=message_object,
                 summary=summary,
-                link=link,
                 event_data=event_data,
-                original_text=message["text"],
             )["blocks"],
             text="New volunteer message detected, offering to add event to calendar on supported platforms",
             user=message["user"],
@@ -57,23 +61,17 @@ def run_app(config):
         ack()
 
         metadata = json.loads(body["actions"][0]["value"])
-        event_data = EventData.from_json(metadata["event_data"])
-        username = get_username(metadata["user_id"], app.client)
-        message_data = SlackMessage(
-            ts=metadata["ts"], text=metadata["original_text"], permalink=metadata["link"], username=username
-        )
-        message_data.link = metadata["link"]
+        event = EventData.from_json(metadata["event_data"])
+        message = SlackMessage.from_json(metadata["message"])
+
         post_calendar_event_from_event(
-            event_data=event_data,
+            event_data=event,
             calendar_client=google_calendar_client,
             hour_offset=2,
-            slack_message=message_data,
+            slack_message=message,
         )
 
-        requests.post(
-            body["response_url"],
-            json={"response_type": "ephemeral", "text": "", "replace_original": True, "delete_original": True},
-        )
+        close_ephemeral(body)
 
         # TODO add calendar link to thread
 
@@ -104,9 +102,6 @@ def run_app(config):
     def calendar_suggestion_no(ack, body, logger):
         ack()
 
-        requests.post(
-            body["response_url"],
-            json={"response_type": "ephemeral", "text": "", "replace_original": True, "delete_original": True},
-        )
+        close_ephemeral(body)
 
     SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()

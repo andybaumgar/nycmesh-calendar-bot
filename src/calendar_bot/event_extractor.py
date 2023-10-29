@@ -9,6 +9,7 @@ from dataclasses_json import dataclass_json
 from dotenv import load_dotenv
 
 from . import config
+from .utils.format_event_description import add_description_disclaimer
 
 load_dotenv()
 
@@ -64,11 +65,10 @@ def get_event_data(date_ts: str, message: str) -> EventData:
     return event_data
 
 
-def get_event_data_summary(event_data: EventData) -> str:
+def get_event_data_summary(event_data: EventData, link: str) -> str:
     human_readable_date = event_data.date.strftime("%A, %B %d, %Y %I:%M %p")
-    summary = (
-        f"""*Title:* {event_data.title}\n*Date:* {human_readable_date} \n*Description:* {event_data.description}"""
-    )
+    disclaimer = add_description_disclaimer(link)
+    summary = f"""*Title:* {event_data.title}\n*Date:* {human_readable_date} \n*Description:* {disclaimer}"""
 
     return summary
 

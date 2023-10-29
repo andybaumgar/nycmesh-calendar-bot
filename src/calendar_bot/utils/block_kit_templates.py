@@ -2,15 +2,13 @@ import json
 
 from calendar_bot.event_extractor import EventData
 
+from ..slack import SlackMessage
+
 
 def confirm_message_block_kit(
-    channel_id=None,
-    message_ts=None,
-    user_id=None,
-    summary=None,
-    link=None,
+    message: SlackMessage,
     event_data: EventData = None,
-    original_text=None,
+    summary: str = None,
 ):
     return {
         "blocks": [
@@ -30,13 +28,8 @@ def confirm_message_block_kit(
                         "style": "primary",
                         "value": json.dumps(
                             {
-                                "channel": channel_id,
-                                "ts": message_ts,
-                                "user_id": user_id,
-                                "summary": summary,
+                                "message": message.to_json(),
                                 "event_data": event_data.to_json(),
-                                "link": link,
-                                "original_text": original_text,
                             }
                         ),
                         "action_id": "calendar_suggestion_ok",
@@ -47,13 +40,8 @@ def confirm_message_block_kit(
                         "action_id": "calendar_suggestion_edit",
                         "value": json.dumps(
                             {
-                                "channel": channel_id,
-                                "ts": message_ts,
-                                "user_id": user_id,
-                                "summary": summary,
-                                "link": link,
+                                "message": message.to_json(),
                                 "event_data": event_data.to_json(),
-                                "original_text": original_text,
                             }
                         ),
                     },

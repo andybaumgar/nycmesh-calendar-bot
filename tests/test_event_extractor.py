@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from calendar_bot.event_extractor import EventData, get_event_data, get_event_data_summary
 from calendar_bot.google_calendar import GoogleCalendarClient
-from calendar_bot.query_slack import SlackMessage
+from calendar_bot.slack import SlackMessage
 
 load_dotenv()
 

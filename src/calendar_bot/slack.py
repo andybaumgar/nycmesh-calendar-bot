@@ -3,20 +3,23 @@ import os
 from dataclasses import asdict, dataclass
 from urllib.parse import quote, urlencode
 
+import requests
+from dataclasses_json import dataclass_json
 from dotenv import load_dotenv
 from slack_bolt import App
 
 load_dotenv()
 
 
-# create data class  returned slack messages
+@dataclass_json
 @dataclass
 class SlackMessage:
     ts: str
     text: str
-    permalink: str
     username: str
-    link: str = None
+    link: str
+    user_id: str
+    channel_id: str
 
 
 def save_messages(messages: SlackMessage, file_path):
@@ -50,6 +53,13 @@ def get_username(id, slack_client):
             return None
     except Exception as e:
         return None
+
+
+def close_ephemeral(body):
+    requests.post(
+        body["response_url"],
+        json={"response_type": "ephemeral", "text": "", "replace_original": True, "delete_original": True},
+    )
 
 
 if __name__ == "__main__":
