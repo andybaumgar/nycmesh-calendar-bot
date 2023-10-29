@@ -39,6 +39,19 @@ def test_good_message_with_link():
     assert event_data.is_event == True
 
 
+def test_day_of_week_daniel():
+    message = {
+        "permalink": "https://nycmesh.slack.com/archives/CLMSV5KNG/p1696029394677579?thread_ts=1696029394.677579",
+        "text": "Good evening, I am planning for Sunday (possible start time 10AM) to cut back over to newly ran ground fiber, and I could use some help with some fiber splicing, installing new enclosures, and switching back over with minimal downtime. Would anyone be available?",
+        "ts": "1698548742.677579",
+        "username": "daniel",
+    }
+
+    slack_message = SlackMessage(**message)
+    event_data = get_event_data(slack_message.ts, slack_message.text)
+    assert event_data.is_event == True
+
+
 def test_bad_random_message():
     message = {
         "permalink": "https://nycmesh.slack.com/archives/CLMSV5KNG/p1695770544800329",
@@ -78,5 +91,17 @@ def test_get_event_data_summary():
     summary = get_event_data_summary(event_data)
 
     print(summary)
+
+
+def test_to_json():
+    date_object = datetime.strptime("2021-09-23T00:00:00", "%Y-%m-%dT%H:%M:%S")
+    event_data = EventData(
+        date=date_object,
+        title="Test event title",
+        is_event=True,
+        description="Test event description",
+    )
+    json_data = event_data.to_json()
+    print(json_data)
 
     # assert summary == expected_summary, f"Summary {summary} does not match expected summary {expected_summary}"

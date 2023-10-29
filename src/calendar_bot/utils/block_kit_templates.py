@@ -1,14 +1,24 @@
 import json
 
+from calendar_bot.event_extractor import EventData
 
-def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, summary=None):
+
+def confirm_message_block_kit(
+    channel_id=None,
+    message_ts=None,
+    user_id=None,
+    summary=None,
+    link=None,
+    event_data: EventData = None,
+    original_text=None,
+):
     return {
         "blocks": [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"It looks like you are posting a volunteer opportunity.\nWould you like to add the event to our calendar?\n\nParsed event details:\n\n{summary}",
+                    "text": f"It looks like you are posting a volunteer opportunity.\nWould you like to add the event to our calendar?\n\nDetails:\n\n{summary}",
                 },
             },
             {
@@ -22,8 +32,11 @@ def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, su
                             {
                                 "channel": channel_id,
                                 "ts": message_ts,
-                                "user": user_id,
-                                summary: summary,
+                                "user_id": user_id,
+                                "summary": summary,
+                                "event_data": event_data.to_json(),
+                                "link": link,
+                                "original_text": original_text,
                             }
                         ),
                         "action_id": "calendar_suggestion_ok",
@@ -36,8 +49,11 @@ def confirm_message_block_kit(channel_id=None, message_ts=None, user_id=None, su
                             {
                                 "channel": channel_id,
                                 "ts": message_ts,
-                                "user": user_id,
-                                "calendar_text": summary,
+                                "user_id": user_id,
+                                "summary": summary,
+                                "link": link,
+                                "event_data": event_data.to_json(),
+                                "original_text": original_text,
                             }
                         ),
                     },

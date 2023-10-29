@@ -11,7 +11,10 @@
       "program": "${workspaceFolder}/src/calendar_bot/cli/bot_server.py",
       "console": "integratedTerminal",
       "justMyCode": true,
-      "args": ["--channel-ids", "C063BL4RJF2"]
+      "args": ["--channel-ids", "C063BL4RJF2"],
+      "autoReload": {
+        "enable": true
+      }
     }
   ]
 }

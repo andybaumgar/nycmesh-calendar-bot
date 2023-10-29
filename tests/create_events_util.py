@@ -1,10 +1,9 @@
 import os
 
 from dotenv import load_dotenv
-from query import get_event_messages
-
 from event_extractor import get_event_data
 from google_calendar import CalendarClient
+from query import get_event_messages
 from utils.date_utils import add_hours_to_date
 
 load_dotenv()

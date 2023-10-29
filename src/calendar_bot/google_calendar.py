@@ -20,9 +20,7 @@ class GoogleCalendarClient:
         SERVICE_ACCOUNT_FILE = "credentials.json"
 
         credentials_dict = self._get_sheets_credentials_from_env()
-        credentials = service_account.Credentials.from_service_account_info(
-            credentials_dict
-        )
+        credentials = service_account.Credentials.from_service_account_info(credentials_dict)
         self.service = build("calendar", "v3", credentials=credentials)
 
     def _get_sheets_credentials_from_env(self):
@@ -74,5 +72,5 @@ class GoogleCalendarClient:
 
 
 if __name__ == "__main__":
-    calendar_client = CalendarClient(os.environ.get("TEST_CALENDAR_ID"))
-    calendar_client.create_event(summary, description, start, end)
+    calendar_client = GoogleCalendarClient(os.environ.get("TEST_CALENDAR_ID"))
+    # calendar_client.create_event(summary, description, start, end)

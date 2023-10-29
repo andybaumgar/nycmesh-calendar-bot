@@ -5,7 +5,10 @@ from datetime import datetime
 from typing import Dict, TypedDict
 
 import openai
+from dataclasses_json import dataclass_json
 from dotenv import load_dotenv
+
+from . import config
 
 load_dotenv()
 
@@ -17,6 +20,7 @@ def unix_time_to_date(unix_time: str) -> str:
     return datetime.fromtimestamp(int(float(unix_time))).strftime("%Y-%m-%d")
 
 
+@dataclass_json
 @dataclass
 class EventData:
     date: datetime
@@ -28,7 +32,7 @@ class EventData:
 def get_calendar_prompt(date_ts: str, message: str) -> str:
     date = unix_time_to_date(date_ts)
 
-    prompt = f"""Given that today is {date}, what is the date mentioned in this message below?  Also include a title (try your best if one is not available).  Also include a is_event field which contains a boolean which corresponds to wheather the input messages appears to be a event opportunity.  Messages which appear to be responses or questions should return false.  These responses will not mention words like "opportunity" and be spoken in a less professional voice.  Messages that are empty should return false.  Please respond with the following json format {{"date":[yyy-mm-ddThh:mm:ss], "title":[title], "is_event":[is_event_boolean]}}.  The title should be short and concise.  Do not include words like "opportunity" or "event" because these are assumed due to the calendar context.  Do not include any other text. "{message}" """
+    prompt = config.prompt.format(date=date, message=message)
 
     return prompt
 
