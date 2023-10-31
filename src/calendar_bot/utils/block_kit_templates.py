@@ -56,30 +56,42 @@ def confirm_message_block_kit(
     }
 
 
-def edit_dialog_block_kit(channel_id, message_ts, user_id, calendar_text):
+def edit_dialog_block_kit(
+    message: SlackMessage,
+    event_data: EventData = None,
+):
     return {
         "type": "modal",
         "callback_id": "calendar_edit_dialog_submit",
         "private_metadata": json.dumps(
-            {"channel": channel_id, "ts": message_ts, "user": user_id, "calendar_text": calendar_text}
+            {
+                "message": message.to_json(),
+                "event_data": event_data.to_json(),
+            }
         ),
-        "title": {"type": "plain_text", "text": "Run node diagnostics", "emoji": True},
-        "submit": {"type": "plain_text", "text": "Submit", "emoji": True},
+        "title": {"type": "plain_text", "text": "Edit calendar post", "emoji": True},
+        "submit": {"type": "plain_text", "text": "Post event ", "emoji": True},
         "close": {"type": "plain_text", "text": "Cancel", "emoji": True},
         "blocks": [
             {
                 "type": "input",
-                "optional": True,
-                "block_id": "numberInputBlock",
+                "block_id": "edit_date",
+                "element": {
+                    "type": "datetimepicker",
+                    "action_id": "datetimepicker-action",
+                    "initial_date_time": int(event_data.date.timestamp()),
+                },
+                "label": {"type": "plain_text", "text": "Event date", "emoji": True},
+            },
+            {
+                "type": "input",
+                "block_id": "edit_title",
+                "label": {"type": "plain_text", "text": "Event title"},
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "plain_input",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "Type your edits here, ex. 'date should be the 12th'",
-                    },
+                    "placeholder": {"type": "plain_text", "text": event_data.title},
                 },
-                "label": {"type": "plain_text", "text": "Node Number or Install Number:", "emoji": True},
             },
         ],
     }

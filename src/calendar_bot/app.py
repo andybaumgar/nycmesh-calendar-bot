@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 from functools import partial
 
 import requests
@@ -10,7 +11,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 from .event_extractor import EventData, get_event_data, get_event_data_summary
 from .google_calendar import GoogleCalendarClient
 from .slack import SlackMessage, close_ephemeral, get_username
-from .utils.block_kit_templates import confirm_message_block_kit
+from .utils.block_kit_templates import confirm_message_block_kit, edit_dialog_block_kit
 from .utils.message_classification import is_in_volunteer_channel
 from .utils.post_event import post_calendar_event_from_event
 
@@ -56,13 +57,18 @@ def run_app(config):
             metadata="test",
         )
 
+    def parse_metadata(body) -> (EventData, SlackMessage):
+        metadata = json.loads(body["actions"][0]["value"])
+        event = EventData.from_json(metadata["event_data"])
+        message = SlackMessage.from_json(metadata["message"])
+
+        return (event, message)
+
     @app.action("calendar_suggestion_ok")
     def calendar_suggestion_ok(ack, body, logger):
         ack()
 
-        metadata = json.loads(body["actions"][0]["value"])
-        event = EventData.from_json(metadata["event_data"])
-        message = SlackMessage.from_json(metadata["message"])
+        event, message = parse_metadata(body)
 
         post_calendar_event_from_event(
             event_data=event,
@@ -75,33 +81,48 @@ def run_app(config):
 
         # TODO add calendar link to thread
 
-    #     requests.post(
-    #         body["response_url"],
-    #         json={"response_type": "ephemeral", "text": "", "replace_original": True, "delete_original": True},
-    #     )
+    @app.action("calendar_suggestion_edit")
+    def calendar_suggestion_edit(ack, body, logger):
+        ack()
 
-    # @app.action("calendar_suggestion_edit")
-    # def calendar_suggestion_edit(ack, body, logger):
-    #     ack()
+        event, message = parse_metadata(body)
 
-    #     metadata = json.loads(body["actions"][0]["value"])
-    #     user = MeshUser(app, metadata["user"], config["nn_property_id"], database_client_cached=database_client_cached)
-    #     nn = user.network_number
+        app.client.views_open(
+            trigger_id=body["trigger_id"],
+            view=edit_dialog_block_kit(
+                message=message,
+                event_data=event,
+            ),
+        )
 
-    #     app.client.views_open(
-    #         trigger_id=body["trigger_id"],
-    #         view=help_suggestion_dialog_block_kit(metadata["channel"], metadata["ts"], metadata["user"], nn=nn),
-    #     )
-
-    #     requests.post(
-    #         body["response_url"],
-    #         json={"response_type": "ephemeral", "text": "", "replace_original": True, "delete_original": True},
-    #     )
+        close_ephemeral(body)
 
     @app.action("calendar_suggestion_no")
     def calendar_suggestion_no(ack, body, logger):
         ack()
 
         close_ephemeral(body)
+
+    @app.view("calendar_edit_dialog_submit")
+    def calendar_edit_dialog_submit(ack, body, client, view, logger):
+        ack()
+
+        metadata = json.loads(view["private_metadata"])
+        event = EventData.from_json(metadata["event_data"])
+        message = SlackMessage.from_json(metadata["message"])
+
+        user_ts = view["state"]["values"]["edit_date"]["datetimepicker-action"]["selected_date_time"]
+        user_title = view["state"]["values"]["edit_title"]["plain_input"]["value"]
+        user_datetime = datetime.fromtimestamp(user_ts)
+
+        event.date = user_datetime
+        event.title = user_title
+
+        post_calendar_event_from_event(
+            event_data=event,
+            calendar_client=google_calendar_client,
+            hour_offset=2,
+            slack_message=message,
+        )
 
     SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()
