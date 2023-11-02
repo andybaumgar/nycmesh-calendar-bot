@@ -20,20 +20,18 @@ def post_calendar_event_from_event(
 ):
     description = add_description_disclaimer(slack_message.link)
 
-    end_with_offset = add_hours_to_date(event_data.date.isoformat(), hour_offset=hour_offset)
+    end = add_hours_to_date(event_data.date.isoformat(), hour_offset=hour_offset)
 
     event = calendar_client.create_event(
         summary=event_data.title,
         description=description,
         start=event_data.date.isoformat(),
-        end=end_with_offset,
+        end=end,
     )
 
     if app is None:
-        return event
+        return
 
     post_calendar_event_link_to_slack(
         app=app, channel_id=slack_message.channel_id, calendar_link=event["htmlLink"], thread_ts=slack_message.ts
     )
-
-    return event

@@ -103,5 +103,3 @@ def test_to_json():
     )
     json_data = event_data.to_json()
     print(json_data)
-
-    # assert summary == expected_summary, f"Summary {summary} does not match expected summary {expected_summary}"

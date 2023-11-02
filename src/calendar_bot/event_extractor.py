@@ -13,12 +13,7 @@ from .utils.format_event_description import add_description_disclaimer
 
 load_dotenv()
 
-# Set your OpenAI API key
 openai.api_key = os.environ["OPENAI_API_KEY"]
-
-
-def unix_time_to_date(unix_time: str) -> str:
-    return datetime.fromtimestamp(int(float(unix_time))).strftime("%Y-%m-%d")
 
 
 @dataclass_json
@@ -30,10 +25,14 @@ class EventData:
     description: str
 
 
-def get_calendar_prompt(date_ts: str, message: str) -> str:
-    date = unix_time_to_date(date_ts)
+def unix_time_to_human_date(unix_time: str) -> str:
+    return datetime.fromtimestamp(int(float(unix_time))).strftime("%Y-%m-%d")
 
-    prompt = config.prompt.format(date=date, message=message)
+
+def get_calendar_prompt(date_ts: str, message: str) -> str:
+    human_date = unix_time_to_human_date(date_ts)
+
+    prompt = config.prompt.format(date=human_date, message=message)
 
     return prompt
 
@@ -71,12 +70,3 @@ def get_event_data_summary(event_data: EventData, link: str) -> str:
     summary = f"""*Title:* {event_data.title}\n*Date:* {human_readable_date} \n*Description:* {disclaimer}"""
 
     return summary
-
-
-if __name__ == "__main__":
-    # Send a message to ChatGPT 3.5
-    message = "Hello, ChatGPT!"
-    response = execute_prompt(message)
-
-    # Print the response
-    print(response)

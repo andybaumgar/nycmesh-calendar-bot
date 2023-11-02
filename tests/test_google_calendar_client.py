@@ -18,11 +18,3 @@ def test_create_event():
         start="2021-09-23T00:00:00",
         end="2021-09-23T02:00:00",
     )
-
-    # date_object = datetime.strptime("2021-09-23T00:00:00", "%Y-%m-%dT%H:%M:%S")
-    # event_data = EventData(
-    #     date=date_object,
-    #     title="Test event title",
-    #     is_event=True,
-    #     description="Test event description",
-    # )

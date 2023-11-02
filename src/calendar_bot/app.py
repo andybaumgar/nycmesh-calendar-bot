@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 from functools import partial
 
-import requests
 from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
@@ -27,9 +26,9 @@ def run_app(config):
 
     @app.event(
         event={"type": "message", "subtype": None},
-        # matchers=[
-        #     partial(is_in_volunteer_channel, support_channel_ids=config["channel_ids"]),
-        # ],
+        matchers=[
+            partial(is_in_volunteer_channel, support_channel_ids=config["channel_ids"]),
+        ],
     )
     def respond_with_calendar_suggestion(message):
         link = app.client.chat_getPermalink(message_ts=message["ts"], channel=message["channel"]).data["permalink"]

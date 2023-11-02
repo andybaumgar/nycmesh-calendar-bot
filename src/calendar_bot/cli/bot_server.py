@@ -16,5 +16,4 @@ def main(channel_ids):
 
 
 if __name__ == "__main__":
-    # main(DEFAULT_CHANNEL_IDS)
     main()

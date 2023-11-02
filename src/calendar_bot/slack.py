@@ -60,7 +60,3 @@ def close_ephemeral(body):
         body["response_url"],
         json={"response_type": "ephemeral", "text": "", "replace_original": True, "delete_original": True},
     )
-
-
-if __name__ == "__main__":
-    get_slack_event_messages()
