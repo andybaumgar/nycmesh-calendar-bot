@@ -70,6 +70,8 @@ class GoogleCalendarClient:
             .execute()
         )
 
+        return event
+
 
 if __name__ == "__main__":
     calendar_client = GoogleCalendarClient(os.environ.get("TEST_CALENDAR_ID"))

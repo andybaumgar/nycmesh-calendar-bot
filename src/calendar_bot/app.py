@@ -75,6 +75,7 @@ def run_app(config):
             calendar_client=google_calendar_client,
             hour_offset=2,
             slack_message=message,
+            app=app,
         )
 
         close_ephemeral(body)
@@ -123,6 +124,7 @@ def run_app(config):
             calendar_client=google_calendar_client,
             hour_offset=2,
             slack_message=message,
+            app=app,
         )
 
     SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()

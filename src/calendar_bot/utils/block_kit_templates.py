@@ -1,7 +1,6 @@
 import json
 
-from calendar_bot.event_extractor import EventData
-
+from ..event_extractor import EventData
 from ..slack import SlackMessage
 
 
@@ -90,7 +89,7 @@ def edit_dialog_block_kit(
                 "element": {
                     "type": "plain_text_input",
                     "action_id": "plain_input",
-                    "placeholder": {"type": "plain_text", "text": event_data.title},
+                    "initial_value": event_data.title,
                 },
             },
         ],
