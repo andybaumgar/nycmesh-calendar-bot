@@ -15,7 +15,6 @@ from .utils.message_classification import is_in_volunteer_channel
 from .utils.post_event import post_calendar_event_from_event
 
 load_dotenv()
-
 google_calendar_client = GoogleCalendarClient(calendar_id=os.environ.get("CALENDAR_ID"))
 
 
@@ -42,6 +41,10 @@ def run_app(config):
         )
 
         event_data = get_event_data(message["ts"], message["text"])
+
+        if not event_data.is_event:
+            return
+
         summary = get_event_data_summary(event_data, link)
 
         app.client.chat_postEphemeral(

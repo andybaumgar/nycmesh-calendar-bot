@@ -56,9 +56,11 @@ def get_event_data(date_ts: str, message: str) -> EventData:
     prompt = get_calendar_prompt(date_ts, message)
     response = execute_prompt(prompt)
     data = json.loads(response["content"])
-    if data["date"] is not None:
+    if data["is_event"]:
         date_object = datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S")
         data["date"] = date_object
+    else:
+        data["date"] = None
     event_data = EventData(**data, description=message)
 
     return event_data
