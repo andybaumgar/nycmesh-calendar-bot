@@ -1,0 +1,7 @@
+version: '3'
+services:
+  calendar-bot:
+    restart: always
+    image: andybaumgar/nycmesh-calendar-bot:latest
+    env_file:
+      - .env

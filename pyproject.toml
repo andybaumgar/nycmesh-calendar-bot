@@ -9,7 +9,8 @@ dependencies = [
     "google_api_python_client", 
     "google_auth_oauthlib", 
     "google-auth-httplib2",
-    "click"
+    "click",
+    "dataclasses-json",
 ]
 
 [project.optional-dependencies]
@@ -20,13 +21,15 @@ dev = [
     "isort == 5.12.*",
     "coverage == 7.3.*",
     "mypy == 1.5.*",
-    "watchdog"
 ]
 
 
 [build-system]
 requires = [ "setuptools >= 61", "wheel", "mypy" ]
 build-backend = "setuptools.build_meta"
+
+[project.scripts]
+nycmesh-calendar-bot = "calendar_bot.cli.bot_server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
