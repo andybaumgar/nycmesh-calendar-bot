@@ -5,6 +5,8 @@ from datetime import datetime
 from typing import Dict, TypedDict
 
 import openai
+
+# import pytz
 from dataclasses_json import dataclass_json
 from dotenv import load_dotenv
 
@@ -58,6 +60,7 @@ def get_event_data(date_ts: str, message: str) -> EventData:
     data = json.loads(response["content"])
     if data["is_event"]:
         date_object = datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S")
+        # date_object = date_object.replace(tzinfo=pytz.timezone("US/Eastern"))
         data["date"] = date_object
     else:
         data["date"] = None
