@@ -13,7 +13,7 @@ from .event_extractor import EventData, get_event_data, get_event_data_summary
 from .google_calendar import GoogleCalendarClient
 from .slack import SlackMessage, close_ephemeral, get_username
 from .utils.block_kit_templates import confirm_message_block_kit, edit_dialog_block_kit
-from .utils.message_classification import is_in_volunteer_channel
+from .utils.message_classification import is_first_message_in_thread, is_in_target_channel
 from .utils.post_event import post_calendar_event_from_event
 
 load_dotenv()
@@ -28,7 +28,8 @@ def run_app(config):
     @app.event(
         event={"type": "message", "subtype": None},
         matchers=[
-            partial(is_in_volunteer_channel, support_channel_ids=config["channel_ids"]),
+            partial(is_in_target_channel, support_channel_ids=config["channel_ids"]),
+            is_first_message_in_thread,
         ],
     )
     def respond_with_calendar_suggestion(message):
