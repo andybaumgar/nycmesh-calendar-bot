@@ -103,6 +103,39 @@ def run_app(config):
 
         close_ephemeral(body)
 
+    @app.shortcut("manually_add_event")
+    def manually_add_event(ack, shortcut, client):
+        ack()
+
+        link = app.client.chat_getPermalink(message_ts=shortcut["message_ts"], channel=shortcut["channel"]["id"]).data[
+            "permalink"
+        ]
+
+        message = SlackMessage(
+            ts=shortcut["message_ts"],
+            text=shortcut["message"]["text"],
+            username=get_username(shortcut["message"]["user"], app.client),
+            link=link,
+            user_id=shortcut["message"]["user"],
+            channel_id=shortcut["channel"]["id"],
+        )
+
+        event = get_event_data(shortcut["message_ts"], shortcut["message"]["text"])
+
+        summary = get_event_data_summary(event, link)
+
+        app.client.chat_postEphemeral(
+            channel=shortcut["channel"]["id"],
+            blocks=confirm_message_block_kit(
+                message=message,
+                summary=summary,
+                event_data=event,
+            )["blocks"],
+            text="New volunteer message detected, offering to add event to calendar on supported platforms",
+            user=shortcut["message"]["user"],
+            metadata="test",
+        )
+
     @app.action("calendar_suggestion_no")
     def calendar_suggestion_no(ack, body, logger):
         ack()
