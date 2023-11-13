@@ -18,5 +18,5 @@ Automatically create calendar events based on Slack messages
 ### Push to Dockerhub
 
 - login to Dockerhub
-- docker build -t andybaumgar/- nycmesh-calendar-bot .
-- docker push andybaumgar/- nycmesh-calendar-bot
+- docker build -t andybaumgar/nycmesh-calendar-bot .
+- docker push andybaumgar/nycmesh-calendar-bot
