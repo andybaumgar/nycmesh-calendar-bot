@@ -1,7 +1,10 @@
+from datetime import datetime, timedelta
+
+import pytz
+
 from ..event_extractor import EventData, get_event_data
 from ..google_calendar import GoogleCalendarClient
 from ..slack import SlackMessage
-from .date_utils import add_hours_to_date
 from .format_event_description import add_description_disclaimer
 
 
@@ -20,13 +23,18 @@ def post_calendar_event_from_event(
 ):
     description = add_description_disclaimer(slack_message.link)
 
-    end = add_hours_to_date(event_data.date.isoformat(), hour_offset=hour_offset)
+    if event_data.date.tzinfo is None:
+        utc_date_start = pytz.utc.localize(event_data.date)
+    else:
+        utc_date_start = event_data.date
+    local_date_start = utc_date_start.astimezone(pytz.timezone("US/Eastern"))
+    local_date_end = local_date_start + timedelta(hours=2)
 
     event = calendar_client.create_event(
         summary=event_data.title,
         description=description,
-        start=event_data.date.isoformat(),
-        end=end,
+        start=local_date_start.isoformat(),
+        end=local_date_end.isoformat(),
     )
 
     if app is None:

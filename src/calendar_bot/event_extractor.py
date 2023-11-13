@@ -5,8 +5,7 @@ from datetime import datetime
 from typing import Dict, TypedDict
 
 import openai
-
-# import pytz
+import pytz
 from dataclasses_json import dataclass_json
 from dotenv import load_dotenv
 
@@ -59,9 +58,11 @@ def get_event_data(date_ts: str, message: str) -> EventData:
     response = execute_prompt(prompt)
     data = json.loads(response["content"])
     if data["is_event"]:
-        date_object = datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S")
-        # date_object = date_object.replace(tzinfo=pytz.timezone("US/Eastern"))
-        data["date"] = date_object
+        # convert string to date and then back to UTC for later serialization
+        date_naive = datetime.strptime(data["date"], "%Y-%m-%dT%H:%M:%S")
+        date_local = pytz.timezone("US/Eastern").localize(date_naive)
+        date_utc = date_local.astimezone(pytz.utc)
+        data["date"] = date_utc
     else:
         data["date"] = None
     event_data = EventData(**data, description=message)
@@ -70,7 +71,8 @@ def get_event_data(date_ts: str, message: str) -> EventData:
 
 
 def get_event_data_summary(event_data: EventData, link: str) -> str:
-    human_readable_date = event_data.date.strftime("%A, %B %d, %Y %I:%M %p")
+    local_date = event_data.date.astimezone(pytz.timezone("US/Eastern"))
+    human_readable_date = local_date.strftime("%A, %B %d, %Y %I:%M %p")
     disclaimer = add_description_disclaimer(link)
     summary = f"""*Title:* {event_data.title}\n*Date:* {human_readable_date} \n*Description:* {disclaimer}"""
 

@@ -1,6 +1,6 @@
 import click
 
-import calendar_bot.app
+from calendar_bot import app
 from calendar_bot.constants import DEFAULT_CHANNEL_IDS
 
 
@@ -12,7 +12,7 @@ from calendar_bot.constants import DEFAULT_CHANNEL_IDS
     multiple=True,
 )
 def main(channel_ids):
-    calendar_bot.app.run_app({"channel_ids": channel_ids})
+    app.run_app({"channel_ids": channel_ids})
 
 
 if __name__ == "__main__":

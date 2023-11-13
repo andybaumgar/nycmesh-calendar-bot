@@ -1,8 +1,10 @@
 import json
 import os
+import time
 from datetime import datetime
 from functools import partial
 
+import pytz
 from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
@@ -114,11 +116,15 @@ def run_app(config):
         event = EventData.from_json(metadata["event_data"])
         message = SlackMessage.from_json(metadata["message"])
 
-        user_ts = view["state"]["values"]["edit_date"]["datetimepicker-action"]["selected_date_time"]
         user_title = view["state"]["values"]["edit_title"]["plain_input"]["value"]
-        user_datetime = datetime.fromtimestamp(user_ts)
 
-        event.date = user_datetime
+        # convert local timestamp into utc datetime
+        user_ts = view["state"]["values"]["edit_date"]["datetimepicker-action"]["selected_date_time"]
+        date_naive = datetime.fromtimestamp(user_ts)
+        date_local = date_naive.astimezone()
+        date_utc = date_local.astimezone(pytz.utc)
+
+        event.date = date_utc
         event.title = user_title
 
         post_calendar_event_from_event(
