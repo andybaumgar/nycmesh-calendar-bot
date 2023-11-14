@@ -114,9 +114,9 @@ def run_app(config):
         message = SlackMessage(
             ts=shortcut["message_ts"],
             text=shortcut["message"]["text"],
-            username=get_username(shortcut["message"]["user"], app.client),
+            username=get_username(shortcut["user"]["id"], app.client),
             link=link,
-            user_id=shortcut["message"]["user"],
+            user_id=shortcut["user"]["id"],
             channel_id=shortcut["channel"]["id"],
         )
 
@@ -132,7 +132,7 @@ def run_app(config):
                 event_data=event,
             )["blocks"],
             text="New volunteer message detected, offering to add event to calendar on supported platforms",
-            user=shortcut["message"]["user"],
+            user=shortcut["user"]["id"],
             metadata="test",
         )
 
